@@ -5,6 +5,12 @@ import { Button } from "../ui/button.jsx";
 import { Label } from "../ui/label.jsx";
 import { Alert, AlertTitle, AlertDescription } from "../Alert.jsx";
 
+// Email validation function using regex
+const validateEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+};
+
 const LoginForm = ({ navigate }) => {
     const [formData, setFormData] = useState({
         email: "",
@@ -19,6 +25,37 @@ const LoginForm = ({ navigate }) => {
         if (error) setError(null);
     };
 
+    const handleButtonClick = (e) => {
+        // Check for empty fields first
+        if (!formData.email && !formData.password) {
+            e.preventDefault(); // Prevent form submission
+            setError("Please enter both email and password");
+            return;
+        }
+
+        if (!formData.email) {
+            e.preventDefault(); // Prevent form submission
+            setError("Please enter your email address");
+            return;
+        }
+
+        if (!formData.password) {
+            e.preventDefault(); // Prevent form submission
+            setError("Please enter your password");
+            return;
+        }
+
+        // Validate email format when button is clicked
+        if (!validateEmail(formData.email)) {
+            e.preventDefault(); // Prevent form submission
+            setError("Please enter a valid email address");
+            return;
+        }
+
+        // If validation passes, form will submit normally
+        // and handleSubmit will be called
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Form submitted with data:", formData);
@@ -26,7 +63,6 @@ const LoginForm = ({ navigate }) => {
         setError(null);
 
         try {
-            // Direct fetch without using AuthContext
             console.log("Making fetch request to /api/auth/login");
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -45,10 +81,8 @@ const LoginForm = ({ navigate }) => {
             console.log("Response data:", data);
 
             if (data.success) {
-                // Redirect to stock market page on success
                 navigate("stockMarket");
             } else {
-                // Show error message
                 setError(data.message || "Login failed. Please check your credentials.");
             }
         } catch (err) {
@@ -100,12 +134,11 @@ const LoginForm = ({ navigate }) => {
                     <Input
                         id="email"
                         name="email"
-                        type="email"
+                        type="text"
                         placeholder="your@email.com"
                         value={formData.email}
                         onChange={handleChange}
                         disabled={isLoading}
-                        required
                     />
                 </div>
 
@@ -119,7 +152,6 @@ const LoginForm = ({ navigate }) => {
                         value={formData.password}
                         onChange={handleChange}
                         disabled={isLoading}
-                        required
                     />
                 </div>
 
@@ -136,6 +168,7 @@ const LoginForm = ({ navigate }) => {
                         type="submit"
                         className="bg-gray-700 hover:bg-gray-800 text-white"
                         disabled={isLoading}
+                        onClick={handleButtonClick}
                     >
                         {isLoading ? (
                             <span className="flex items-center gap-2">
