@@ -1,4 +1,5 @@
 import { Button } from "./ui/button";
+import {ModeToggle} from "@/components/mode-toggle.jsx";
 
 const Header = ({ navigate, currentPage }) => {
     return (
@@ -25,6 +26,7 @@ const Header = ({ navigate, currentPage }) => {
                 >
                     Register
                 </Button>
+                <ModeToggle />
             </nav>
         </header>
     );
