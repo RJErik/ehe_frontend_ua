@@ -1,4 +1,3 @@
-// RegisterForm.jsx
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "../ui/avatar.jsx";
 import { Input } from "../ui/input.jsx";
@@ -33,6 +32,8 @@ const RegisterForm = ({ navigate }) => {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+    const [resendLoading, setResendLoading] = useState(false);
 
     const handleCancel = () => {
         if (navigate) {
@@ -45,6 +46,55 @@ const RegisterForm = ({ navigate }) => {
         setFormData(prev => ({ ...prev, [name]: value }));
         // Clear error when user starts typing
         if (error) setError(null);
+        if (success) setSuccess(null);
+    };
+
+    const handleResendVerification = async (email) => {
+        if (!email || resendLoading) return;
+
+        setResendLoading(true);
+        try {
+            const response = await fetch('/api/auth/resend-verification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                setSuccess({
+                    message: data.message,
+                    details: data.details || "Check your email for the verification link.",
+                    email
+                });
+                setError(null);
+            } else if (response.status === 429) {
+                // Rate limit hit
+                setError({
+                    message: data.message,
+                    details: data.details
+                });
+                setSuccess(null);
+            } else {
+                // Other error
+                setError({
+                    message: data.message,
+                    details: data.details
+                });
+                setSuccess(null);
+            }
+        } catch (err) {
+            console.error("Failed to resend verification:", err);
+            setError({
+                message: "Failed to resend verification email.",
+                details: "Please try again later."
+            });
+            setSuccess(null);
+        } finally {
+            setResendLoading(false);
+        }
     };
 
     const handleButtonClick = (e) => {
@@ -115,6 +165,7 @@ const RegisterForm = ({ navigate }) => {
         console.log("Form submitted with data:", formData);
         setIsLoading(true);
         setError(null);
+        setSuccess(null);
 
         try {
             console.log("Making fetch request to /api/auth/register");
@@ -130,16 +181,24 @@ const RegisterForm = ({ navigate }) => {
             });
 
             console.log("Response received:", response);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error ${response.status}`);
-            }
-
             const data = await response.json();
             console.log("Response data:", data);
 
             if (data.success) {
-                navigate("stockMarket");
+                // Instead of navigating, show success message with the registration success info
+                setSuccess({
+                    message: data.message,
+                    details: "Please check your email for the verification link.",
+                    email: formData.email
+                });
+
+                // Clear the form on successful registration
+                setFormData({
+                    name: "",
+                    email: "",
+                    password: "",
+                    confirmPassword: ""
+                });
             } else {
                 setError(data.message || "Registration failed. Please try again.");
             }
@@ -154,7 +213,7 @@ const RegisterForm = ({ navigate }) => {
     return (
         <div className="max-w-md mx-auto mt-8 flex flex-col items-center">
             <Avatar className="h-16 w-16 mb-4">
-                <AvatarFallback className="bg-gray-200">
+                <AvatarFallback>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -171,12 +230,50 @@ const RegisterForm = ({ navigate }) => {
                 </AvatarFallback>
             </Avatar>
 
-            <h1 className="text-4xl font-semibold text-gray-600 mb-8">Register</h1>
+            <h1 className="text-4xl font-semibold mb-8">Register</h1>
 
             {error && (
                 <Alert variant="destructive" className="mb-6 w-full">
                     <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription>
+                        <p>{typeof error === 'string' ? error : error.message}</p>
+                        {typeof error !== 'string' && error.details && (
+                            <p className="mt-2 text-sm opacity-90">{error.details}</p>
+                        )}
+                    </AlertDescription>
+                </Alert>
+            )}
+
+            {success && (
+                <Alert className="mb-6 w-full border-green-500 bg-green-50 dark:bg-green-950 dark:border-green-800">
+                    <AlertTitle className="text-green-800 dark:text-green-400">Success</AlertTitle>
+                    <AlertDescription className="text-green-700 dark:text-green-300">
+                        <p>{success.message}</p>
+                        {success.details && (
+                            <p className="mt-2 text-sm">{success.details}</p>
+                        )}
+                        {success.email && (
+                            <div className="mt-4">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleResendVerification(success.email)}
+                                    disabled={resendLoading}
+                                    className="border-green-500 text-green-700 hover:bg-green-100 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900"
+                                >
+                                    {resendLoading ? (
+                                        <span className="flex items-center gap-2">
+                                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Sending...
+                                        </span>
+                                    ) : "Resend Verification Email"}
+                                </Button>
+                            </div>
+                        )}
+                    </AlertDescription>
                 </Alert>
             )}
 
@@ -243,7 +340,6 @@ const RegisterForm = ({ navigate }) => {
                     </Button>
                     <Button
                         type="submit"
-                        className="bg-gray-500 hover:bg-gray-600"
                         disabled={isLoading}
                         onClick={handleButtonClick}
                     >

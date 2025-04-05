@@ -98,10 +98,10 @@ const LoginForm = ({ navigate }) => {
     };
 
     return (
-        <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-md">
+        <div className="max-w-md w-full p-6 rounded-lg shadow-md">
             <div className="flex flex-col items-center mb-6">
                 <Avatar className="h-16 w-16 mb-4">
-                    <AvatarFallback className="bg-gray-200">
+                    <AvatarFallback>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
@@ -118,7 +118,7 @@ const LoginForm = ({ navigate }) => {
                     </AvatarFallback>
                 </Avatar>
 
-                <h1 className="text-2xl font-bold text-gray-900">Log In</h1>
+                <h1 className="text-2xl font-bold">Log In</h1>
             </div>
 
             {error && (
@@ -166,7 +166,6 @@ const LoginForm = ({ navigate }) => {
                     </Button>
                     <Button
                         type="submit"
-                        className="bg-gray-700 hover:bg-gray-800 text-white"
                         disabled={isLoading}
                         onClick={handleButtonClick}
                     >

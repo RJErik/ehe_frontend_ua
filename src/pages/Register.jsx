@@ -4,7 +4,7 @@ import RegisterForm from "../components/register/RegisterForm.jsx";
 const Register = ({ navigate }) => {
     return (
         <div className="min-h-screen flex flex-col">
-            <Header navigate={navigate} />
+            <Header navigate={navigate} currentPage="register"/>
             <main className="flex-1 flex items-start justify-center p-4">
                 <RegisterForm navigate={navigate} />
             </main>

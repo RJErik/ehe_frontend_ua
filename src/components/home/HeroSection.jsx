@@ -4,12 +4,12 @@ import { Avatar, AvatarFallback } from "../ui/avatar.jsx";
 const HeroSection = ({ navigate }) => {
     return (
         <div className="flex flex-col items-center justify-center min-h-[50vh] py-12">
-            <h1 className="text-4xl font-semibold text-gray-600 mb-2">Event Horizon Exchange</h1>
-            <p className="text-xl text-gray-500 mb-12">A powerful stocktrading platform</p>
+            <h1 className="text-4xl font-semibold mb-2">Event Horizon Exchange</h1>
+            <p className="text-xl mb-12">A powerful stocktrading platform</p>
 
             <div className="flex flex-col items-center mb-8">
                 <Avatar className="h-16 w-16 mb-4">
-                    <AvatarFallback className="bg-gray-200">
+                    <AvatarFallback>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
@@ -36,7 +36,7 @@ const HeroSection = ({ navigate }) => {
                     Log In
                 </Button>
                 <Button
-                    className="bg-gray-500 hover:bg-gray-600 min-w-[120px]"
+                    className="min-w-[120px]"
                     onClick={() => navigate && navigate("register")}
                 >
                     Register
