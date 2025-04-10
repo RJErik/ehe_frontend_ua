@@ -11,55 +11,29 @@ const validateEmail = (email) => {
     return regex.test(email);
 };
 
-// Username validation (alphanumeric and underscore only, minimum 3 characters)
-const validateUsername = (username) => {
-    const regex = /^[a-zA-Z0-9_]{3,}$/;
-    return regex.test(username);
-};
-
-// Password validation (min 8 characters, at least 1 letter and 1 number)
-const validatePassword = (password) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return regex.test(password);
-};
-
-const RegisterForm = ({ navigate }) => {
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: ""
-    });
+const ForgotPasswordForm = ({ navigate, initialEmail = "" }) => {
+    const [email, setEmail] = useState(initialEmail);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [resendLoading, setResendLoading] = useState(false);
-    // Store email separately for resend functionality
-    const [registeredEmail, setRegisteredEmail] = useState(null);
-
-    const handleCancel = () => {
-        if (navigate) {
-            navigate("home");
-        }
-    };
+    const [submittedEmail, setSubmittedEmail] = useState(initialEmail || null);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing
+        setEmail(e.target.value);
         if (error) setError(null);
         if (success) setSuccess(null);
     };
 
-    const handleResendVerification = async () => {
-        if (!registeredEmail || resendLoading) return;
+    const handleResendRequest = async () => {
+        if (!submittedEmail || resendLoading) return;
 
         setResendLoading(true);
         try {
-            const response = await fetch('/api/auth/resend-verification', {
+            const response = await fetch('/api/auth/forgot-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: registeredEmail }),
+                body: JSON.stringify({ email: submittedEmail }),
                 credentials: 'include'
             });
 
@@ -74,16 +48,16 @@ const RegisterForm = ({ navigate }) => {
                 setError(null);
             } else {
                 setError({
-                    message: data.message || "Failed to resend verification email.",
+                    message: data.message || "Failed to request password reset.",
                     showResendButton: data.showResendButton !== false,
                     actionLink: data.actionLink || null
                 });
                 setSuccess(null);
             }
         } catch (err) {
-            console.error("Failed to resend verification:", err);
+            console.error("Failed to request password reset:", err);
             setError({
-                message: "Failed to resend verification email. Please try again later.",
+                message: "Failed to request password reset. Please try again later.",
                 showResendButton: true
             });
         } finally {
@@ -92,120 +66,59 @@ const RegisterForm = ({ navigate }) => {
     };
 
     const handleButtonClick = (e) => {
-        // Validation checks before form submission
-        if (!formData.name && !formData.email && !formData.confirmPassword && !formData.password) {
-            e.preventDefault();
-            setError({ message: "Please fill in all fields", showResendButton: false });
-            return;
-        }
-
-        if (!formData.name) {
-            e.preventDefault();
-            setError({ message: "Please enter a username", showResendButton: false });
-            return;
-        }
-
-        if (!formData.email) {
+        // Validate before submitting
+        if (!email || email.trim() === '') {
             e.preventDefault();
             setError({ message: "Please enter your email address", showResendButton: false });
             return;
         }
 
-        if (!formData.password) {
-            e.preventDefault();
-            setError({ message: "Please enter a password", showResendButton: false });
-            return;
-        }
-
-        if (!formData.confirmPassword) {
-            e.preventDefault();
-            setError({ message: "Please confirm your password", showResendButton: false });
-            return;
-        }
-
-        if (!validateUsername(formData.name)) {
-            e.preventDefault();
-            setError({ message: "Username must be at least 3 characters and contain only letters, numbers, and underscores", showResendButton: false });
-            return;
-        }
-
-        if (!validateEmail(formData.email)) {
+        if (!validateEmail(email)) {
             e.preventDefault();
             setError({ message: "Please enter a valid email address", showResendButton: false });
-            return;
-        }
-
-        if (!validatePassword(formData.password)) {
-            e.preventDefault();
-            setError({ message: "Password must be at least 8 characters with at least one letter and one number", showResendButton: false });
-            return;
-        }
-
-        if (formData.password !== formData.confirmPassword) {
-            e.preventDefault();
-            setError({ message: "Passwords do not match", showResendButton: false });
             return;
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         setIsLoading(true);
         setError(null);
         setSuccess(null);
 
-        // Save the email for potential resend operations
-        const submittedEmail = formData.email;
+        // Store the email for potential resend operations
+        const emailToSubmit = email.trim();
+        setSubmittedEmail(emailToSubmit);
 
         try {
-            const response = await fetch('/api/auth/register', {
+            const response = await fetch('/api/auth/forgot-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: formData.name,
-                    email: submittedEmail,
-                    password: formData.password
-                }),
+                body: JSON.stringify({ email: emailToSubmit }),
                 credentials: 'include'
             });
 
             const data = await response.json();
 
             if (data.success) {
-                // Store email for resend functionality
-                setRegisteredEmail(submittedEmail);
-
-                // Set success message with any action link
                 setSuccess({
                     message: data.message,
                     showResendButton: data.showResendButton === true,
                     actionLink: data.actionLink || null
                 });
 
-                // Clear all form fields on success
-                setFormData({
-                    name: "",
-                    email: "",
-                    password: "",
-                    confirmPassword: ""
-                });
+                // Clear form on success
+                setEmail("");
             } else {
-                // For errors where resend might be needed
-                if (data.showResendButton) {
-                    setRegisteredEmail(submittedEmail);
-                }
-
-                // Set error message with any action link
                 setError({
-                    message: data.message || "Registration failed. Please try again.",
+                    message: data.message || "Request failed. Please try again.",
                     showResendButton: data.showResendButton === true,
                     actionLink: data.actionLink || null
                 });
-
-                // Keep form data as is for error case
             }
         } catch (err) {
-            console.error("Registration error:", err);
+            console.error("Password reset request error:", err);
             setError({
                 message: "An error occurred. Please try again later.",
                 showResendButton: false
@@ -213,6 +126,10 @@ const RegisterForm = ({ navigate }) => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleCancel = () => {
+        navigate("login");
     };
 
     return (
@@ -229,13 +146,16 @@ const RegisterForm = ({ navigate }) => {
                         strokeLinejoin="round"
                         className="h-10 w-10"
                     >
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
+                        <path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 01-2 2H4a2 2 0 01-2-2V10a2 2 0 012-2h3.9L9 6a5 5 0 015 0l1.1 2z"></path>
+                        <rect width="10" height="1" x="7" y="15" rx=".5"></rect>
                     </svg>
                 </AvatarFallback>
             </Avatar>
 
-            <h1 className="text-4xl font-semibold mb-8">Register</h1>
+            <h1 className="text-4xl font-semibold mb-4">Reset Password</h1>
+            <p className="text-center text-muted-foreground mb-8">
+                Enter your email address and we'll send you a link to reset your password.
+            </p>
 
             <div className="w-full">
                 {error && (
@@ -255,17 +175,17 @@ const RegisterForm = ({ navigate }) => {
                                 )}
                             </span>
 
-                            {/* Resend verification button */}
-                            {typeof error !== 'string' && error.showResendButton && registeredEmail && (
+                            {/* Resend reset email button */}
+                            {typeof error !== 'string' && error.showResendButton && submittedEmail && (
                                 <div className="mt-4">
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={handleResendVerification}
+                                        onClick={handleResendRequest}
                                         disabled={resendLoading}
                                         className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900"
                                     >
-                                        {resendLoading ? "Sending..." : "Resend Verification Email"}
+                                        {resendLoading ? "Sending..." : "Resend Reset Email"}
                                     </Button>
                                 </div>
                             )}
@@ -290,17 +210,17 @@ const RegisterForm = ({ navigate }) => {
                                 )}
                             </span>
 
-                            {/* Resend verification button */}
-                            {success.showResendButton && registeredEmail && (
+                            {/* Resend reset email button */}
+                            {success.showResendButton && submittedEmail && (
                                 <div className="mt-4">
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={handleResendVerification}
+                                        onClick={handleResendRequest}
                                         disabled={resendLoading}
                                         className="border-green-500 text-green-700 hover:bg-green-100 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-900"
                                     >
-                                        {resendLoading ? "Sending..." : "Resend Verification Email"}
+                                        {resendLoading ? "Sending..." : "Resend Reset Email"}
                                     </Button>
                                 </div>
                             )}
@@ -311,51 +231,12 @@ const RegisterForm = ({ navigate }) => {
 
             <form onSubmit={handleSubmit} className="w-full space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="name">Username</Label>
-                    <Input
-                        id="name"
-                        name="name"
-                        placeholder="Your Username"
-                        value={formData.name}
-                        onChange={handleChange}
-                        disabled={isLoading}
-                    />
-                </div>
-
-                <div className="space-y-2">
                     <Label htmlFor="email">E-mail</Label>
                     <Input
                         id="email"
-                        name="email"
                         type="email"
                         placeholder="your@email.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        disabled={isLoading}
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                        id="password"
-                        name="password"
-                        type="password"
-                        placeholder="••••••"
-                        value={formData.password}
-                        onChange={handleChange}
-                        disabled={isLoading}
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type="password"
-                        placeholder="••••••"
-                        value={formData.confirmPassword}
+                        value={email}
                         onChange={handleChange}
                         disabled={isLoading}
                     />
@@ -383,9 +264,9 @@ const RegisterForm = ({ navigate }) => {
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <span>Registering...</span>
+                                <span>Sending...</span>
                             </div>
-                        ) : "Register"}
+                        ) : "Reset Password"}
                     </Button>
                 </div>
             </form>
@@ -393,4 +274,4 @@ const RegisterForm = ({ navigate }) => {
     );
 };
 
-export default RegisterForm;
+export default ForgotPasswordForm;
