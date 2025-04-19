@@ -1,5 +1,5 @@
 import { Button } from "./ui/button";
-import { ModeToggle } from "@/components/mode-toggle.jsx";
+import { ModeToggle } from "@/components/Mode-toggle.jsx";
 import { Menubar } from "./ui/menubar";
 
 const Header = ({ navigate, currentPage }) => {

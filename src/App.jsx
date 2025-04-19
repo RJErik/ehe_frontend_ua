@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import VerifyRegistration from "./pages/VerifyRegistration.jsx";
+import VerifyEmailChange from "./pages/VerifyEmailChange.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 
@@ -19,6 +20,8 @@ function App() {
         if (token) {
             if (path.includes('/verify-registration')) {
                 navigate('verify', { token });
+            } else if (path.includes('/verify-email-change')) {
+                navigate('verify-email-change', { token });
             } else if (path.includes('/reset-password')) {
                 navigate('reset-password', { token });
             } else {
@@ -39,6 +42,7 @@ function App() {
             case "register": return <Register navigate={navigate} />;
             case "login": return <Login navigate={navigate} />;
             case "verify": return <VerifyRegistration navigate={navigate} params={pageParams} />;
+            case "verify-email-change": return <VerifyEmailChange navigate={navigate} params={pageParams} />;
             case "forgot-password": return <ForgotPassword navigate={navigate} params={pageParams} />;
             case "reset-password": return <ResetPassword navigate={navigate} params={pageParams} />;
             default: return <Home navigate={navigate} />;

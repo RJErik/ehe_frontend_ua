@@ -124,22 +124,7 @@ const LoginForm = ({ navigate }) => {
             console.log("Response data:", data);
 
             if (data.success) {
-                if (data.message) {
-                    // If there's a success message but we should stay on this page
-                    setSuccess({
-                        message: data.message,
-                        showResendButton: data.showResendButton === true,
-                        actionLink: data.actionLink || null
-                    });
-
-                    // Store email for potential resend functionality
-                    if (data.showResendButton) {
-                        setRegisteredEmail(submittedEmail);
-                    }
-                } else {
-                    // Default navigation on successful login
-                    navigate("stockMarket");
-                }
+                window.location.href = "/user";
             } else {
                 // For errors where resend might be needed
                 if (data.showResendButton) {
@@ -168,8 +153,10 @@ const LoginForm = ({ navigate }) => {
         navigate("home");
     };
 
+    // Rest of the component remains unchanged
     return (
         <div className="max-w-xs w-full mx-auto mt-8 flex flex-col items-center">
+            {/* Component JSX remains the same */}
             <Avatar className="h-16 w-16 mb-4">
                 <AvatarFallback>
                     <svg

@@ -12,11 +12,20 @@ export default defineConfig({
     },
   },
   server: {
+    port: 5173, // Specify the main port explicitly
     proxy: {
+      // Keep existing API proxy
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false
+      },
+      // Add proxy for authorized app
+      '/user': {
+        target: 'http://localhost:5174', // Port where authorized app runs
+        changeOrigin: true,
+        secure: false,
+        // No rewrite needed since authorized app has base: "/user/"
       }
     }
   }
