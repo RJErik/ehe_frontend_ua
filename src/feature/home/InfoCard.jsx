@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardContent } from "../ui/card.jsx";
+import { Card, CardHeader, CardContent } from "../../components/ui/card.jsx";
 
 const InfoCard = ({ title, children }) => {
     return (

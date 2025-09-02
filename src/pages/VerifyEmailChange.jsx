@@ -1,10 +1,13 @@
-// src/pages/VerifyEmailChange.jsx
+// src/pages/VerifyEmailChange.jsx - Updated with React Router
 import { useState, useEffect } from "react";
-import Header from "../components/Header";
-import { Alert, AlertTitle, AlertDescription } from "../components/Alert";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Alert, AlertTitle, AlertDescription } from "../feature/Alert.jsx";
 import { Button } from "../components/ui/button";
 
-const VerifyEmailChange = ({ navigate, params }) => {
+const VerifyEmailChange = () => {
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
     const [verificationState, setVerificationState] = useState({
         loading: true,
         success: false,
@@ -12,8 +15,8 @@ const VerifyEmailChange = ({ navigate, params }) => {
     });
 
     useEffect(() => {
-        // Extract token from params or URL
-        const token = params?.token || new URLSearchParams(window.location.search).get("token");
+        // Get token from URL search parameters
+        const token = searchParams.get("token");
 
         if (!token) {
             setVerificationState({
@@ -50,11 +53,10 @@ const VerifyEmailChange = ({ navigate, params }) => {
         };
 
         verifyToken();
-    }, [params]);
+    }, [searchParams]);
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Header navigate={navigate} />
             <main className="flex-1 flex items-center justify-center p-4">
                 <div className="max-w-md w-full">
                     <h1 className="text-3xl font-bold text-center mb-6">Email Change Verification</h1>
@@ -73,7 +75,7 @@ const VerifyEmailChange = ({ navigate, params }) => {
                                 {verificationState.message}
                                 <div className="mt-4">
                                     <Button
-                                        onClick={() => navigate('login')}
+                                        onClick={() => navigate('/login')}
                                         className="bg-green-600 hover:bg-green-700 text-white"
                                     >
                                         Log In Now
@@ -88,14 +90,14 @@ const VerifyEmailChange = ({ navigate, params }) => {
                                 {verificationState.message}
                                 <div className="mt-4">
                                     <Button
-                                        onClick={() => navigate('login')}
+                                        onClick={() => navigate('/login')}
                                         className="bg-primary hover:bg-primary/90 text-white mr-2"
                                     >
                                         Log In
                                     </Button>
                                     <Button
                                         variant="outline"
-                                        onClick={() => navigate('home')}
+                                        onClick={() => navigate('/')}
                                         className="ml-2"
                                     >
                                         Return to Home

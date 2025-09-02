@@ -1,12 +1,16 @@
+// src/pages/ResetPassword.jsx - Updated with React Router
 import { useState, useEffect } from "react";
-import Header from "../components/Header";
-import ResetPasswordForm from "../components/resetPassword/ResetPasswordForm.jsx";
-import { Alert, AlertTitle, AlertDescription } from "../components/Alert.jsx";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import ResetPasswordForm from "@/feature/resetPassword/ResetPasswordForm.jsx";
+import { Alert, AlertTitle, AlertDescription } from "../feature/Alert.jsx";
 import { Button } from "../components/ui/button.jsx";
 import { Input } from "../components/ui/input.jsx";
 import { Label } from "../components/ui/label.jsx";
 
-const ResetPassword = ({ navigate, params }) => {
+const ResetPassword = () => {
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
     const [tokenState, setTokenState] = useState({
         loading: true,
         isValid: false,
@@ -20,8 +24,8 @@ const ResetPassword = ({ navigate, params }) => {
     const [resendSuccess, setResendSuccess] = useState(false);
 
     useEffect(() => {
-        // Extract token from params or URL
-        const token = params?.token || new URLSearchParams(window.location.search).get("token");
+        // Get token from URL search parameters
+        const token = searchParams.get("token");
 
         if (!token) {
             setTokenState({
@@ -64,7 +68,7 @@ const ResetPassword = ({ navigate, params }) => {
         };
 
         validateToken();
-    }, [params]);
+    }, [searchParams]);
 
     const handleResendRequest = () => {
         // Show email form when resend button is clicked
@@ -120,7 +124,6 @@ const ResetPassword = ({ navigate, params }) => {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Header navigate={navigate} />
             <main className="flex-1 flex items-center justify-center p-4">
                 <div className="max-w-md w-full">
                     <h1 className="text-3xl font-bold text-center mb-6">Reset Your Password</h1>
@@ -132,7 +135,6 @@ const ResetPassword = ({ navigate, params }) => {
                         </div>
                     ) : tokenState.isValid ? (
                         <ResetPasswordForm
-                            navigate={navigate}
                             token={tokenState.token}
                         />
                     ) : resendSuccess ? (
@@ -146,7 +148,7 @@ const ResetPassword = ({ navigate, params }) => {
                                 <div className="mt-4">
                                     <Button
                                         variant="outline"
-                                        onClick={() => navigate('home')}
+                                        onClick={() => navigate('/')}
                                         className="border-green-500 hover:bg-green-50 text-green-700"
                                     >
                                         Return to Home
@@ -222,7 +224,7 @@ const ResetPassword = ({ navigate, params }) => {
                                 <div className="mt-4">
                                     <Button
                                         variant="outline"
-                                        onClick={() => navigate('home')}
+                                        onClick={() => navigate('/')}
                                     >
                                         Return to Home
                                     </Button>

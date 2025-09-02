@@ -1,12 +1,10 @@
-import Header from "../components/Header";
-import LoginForm from "../components/login/LoginForm.jsx";
+import LoginForm from "@/feature/login/LoginForm.jsx";
 
-const Login = ({ navigate }) => {
+const Login = () => {
     return (
         <div className="min-h-screen flex flex-col">
-            <Header navigate={navigate} currentPage="login" />
             <main className="flex-1 flex items-center justify-center p-4">
-                <LoginForm navigate={navigate} />
+                <LoginForm />
             </main>
         </div>
     );

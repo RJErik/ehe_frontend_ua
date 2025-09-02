@@ -1,7 +1,9 @@
-import { Button } from "../ui/button.jsx";
-import { Avatar, AvatarFallback } from "../ui/avatar.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { Avatar, AvatarFallback } from "../../components/ui/avatar.jsx";
+import { useNavigate } from "react-router-dom";
 
-const HeroSection = ({ navigate }) => {
+const HeroSection = () => {
+    const navigate = useNavigate()
     return (
         <div className="flex flex-col items-center justify-center min-h-[50vh] py-12">
             <h1 className="text-4xl font-semibold mb-2">Event Horizon Exchange</h1>
@@ -31,13 +33,13 @@ const HeroSection = ({ navigate }) => {
                 <Button
                     variant="outline"
                     className="min-w-[120px]"
-                    onClick={() => navigate && navigate("login")}
+                    onClick={() => navigate("/login")}
                 >
                     Log In
                 </Button>
                 <Button
                     className="min-w-[120px]"
-                    onClick={() => navigate && navigate("register")}
+                    onClick={() => navigate("/register")}
                 >
                     Register
                 </Button>

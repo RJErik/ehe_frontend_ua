@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "../ui/avatar.jsx";
-import { Input } from "../ui/input.jsx";
-import { Button } from "../ui/button.jsx";
-import { Label } from "../ui/label.jsx";
+import { Avatar, AvatarFallback } from "../../components/ui/avatar.jsx";
+import { Input } from "../../components/ui/input.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { Label } from "../../components/ui/label.jsx";
 import { Alert, AlertTitle, AlertDescription } from "../Alert.jsx";
+import { useNavigate } from "react-router-dom";
 
 // Email validation using regex
 const validateEmail = (email) => {
@@ -11,7 +12,8 @@ const validateEmail = (email) => {
     return regex.test(email);
 };
 
-const ForgotPasswordForm = ({ navigate, initialEmail = "" }) => {
+const ForgotPasswordForm = ({ initialEmail = "" }) => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState(initialEmail);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -129,7 +131,7 @@ const ForgotPasswordForm = ({ navigate, initialEmail = "" }) => {
     };
 
     const handleCancel = () => {
-        navigate("login");
+        navigate("/login");
     };
 
     return (
@@ -168,7 +170,7 @@ const ForgotPasswordForm = ({ navigate, initialEmail = "" }) => {
                                     <Button
                                         variant="link"
                                         className="p-0 px-1.5 h-auto text-red-300 hover:text-red-400 font-medium inline"
-                                        onClick={() => navigate && navigate(error.actionLink.target)}
+                                        onClick={() => navigate("/" + error.actionLink.target)}
                                     >
                                         {error.actionLink.text}
                                     </Button>
@@ -203,7 +205,7 @@ const ForgotPasswordForm = ({ navigate, initialEmail = "" }) => {
                                     <Button
                                         variant="link"
                                         className="p-0 px-1.5 h-auto text-green-700 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 font-medium inline"
-                                        onClick={() => navigate && navigate(success.actionLink.target)}
+                                        onClick={() => navigate("/" + success.actionLink.target)}
                                     >
                                         {success.actionLink.text}
                                     </Button>

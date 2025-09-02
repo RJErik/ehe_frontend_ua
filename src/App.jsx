@@ -1,58 +1,39 @@
-import { useState, useEffect } from "react";
+// App.jsx - Auth app with React Router and token handling
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import VerifyRegistration from "./pages/VerifyRegistration.jsx";
-import VerifyEmailChange from "./pages/VerifyEmailChange.jsx";
-import ForgotPassword from "./pages/ForgotPassword.jsx";
-import ResetPassword from "./pages/ResetPassword.jsx";
+import VerifyRegistration from "./pages/VerifyRegistration";
+import VerifyEmailChange from "./pages/VerifyEmailChange";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Header from "./feature/Header";
 
-function App() {
-    const [currentPage, setCurrentPage] = useState("home");
-    const [pageParams, setPageParams] = useState({});
-
-    useEffect(() => {
-        // Check URL for token on initial load
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const path = window.location.pathname;
-
-        if (token) {
-            if (path.includes('/verify-registration')) {
-                navigate('verify', { token });
-            } else if (path.includes('/verify-email-change')) {
-                navigate('verify-email-change', { token });
-            } else if (path.includes('/reset-password')) {
-                navigate('reset-password', { token });
-            } else {
-                // Default to verification if no specific path
-                navigate('verify', { token });
-            }
-        }
-    }, []);
-
-    const navigate = (page, params = {}) => {
-        setCurrentPage(page);
-        setPageParams(params);
-    };
-
-    const renderPage = () => {
-        switch (currentPage) {
-            case "home": return <Home navigate={navigate} />;
-            case "register": return <Register navigate={navigate} />;
-            case "login": return <Login navigate={navigate} />;
-            case "verify": return <VerifyRegistration navigate={navigate} params={pageParams} />;
-            case "verify-email-change": return <VerifyEmailChange navigate={navigate} params={pageParams} />;
-            case "forgot-password": return <ForgotPassword navigate={navigate} params={pageParams} />;
-            case "reset-password": return <ResetPassword navigate={navigate} params={pageParams} />;
-            default: return <Home navigate={navigate} />;
-        }
-    };
-
+// Wrapper component to provide token handler
+const AppContent = () => {
     return (
         <>
-            {renderPage()}
+            <Header />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/verify-registration" element={<VerifyRegistration />} />
+                <Route path="/verify-email-change" element={<VerifyEmailChange />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                {/* Redirect any unknown routes to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
         </>
+    );
+};
+
+function App() {
+    return (
+        <BrowserRouter>
+            <AppContent />
+        </BrowserRouter>
     );
 }
 

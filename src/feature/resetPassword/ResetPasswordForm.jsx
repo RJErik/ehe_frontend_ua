@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Input } from "../../components/ui/input.jsx";
 import { Button } from "../../components/ui/button.jsx";
 import { Label } from "../../components/ui/label.jsx";
-import { Alert, AlertTitle, AlertDescription } from "../../components/Alert.jsx";
+import { Alert, AlertTitle, AlertDescription } from "../Alert.jsx";
+import { useNavigate } from "react-router-dom";
 
 // Password validation (min 8 characters, at least 1 letter and 1 number)
 const validatePassword = (password) => {
@@ -10,7 +11,8 @@ const validatePassword = (password) => {
     return regex.test(password);
 };
 
-const ResetPasswordForm = ({ navigate, token }) => {
+const ResetPasswordForm = ({ token }) => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         password: "",
         confirmPassword: ""
@@ -126,7 +128,7 @@ const ResetPasswordForm = ({ navigate, token }) => {
                             {success.showLoginButton && (
                                 <div className="mt-4">
                                     <Button
-                                        onClick={() => navigate('login')}
+                                        onClick={() => navigate('/login')}
                                         className="bg-green-600 hover:bg-green-700 text-white"
                                     >
                                         Log In Now
