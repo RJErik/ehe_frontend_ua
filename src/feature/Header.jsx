@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../components/ui/button.jsx";
 import { ModeToggle } from "@/feature/Mode-toggle.jsx";
 import { Menubar } from "../components/ui/menubar.jsx";
+import Logo from "../assets/Logo.png";
 
 const Header = () => {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Header = () => {
                 className="cursor-pointer h-10 w-10"
                 onClick={() => navigate("/")}
             >
-                Logo
+                <img src={Logo} className="rotating-image" alt="Logo"/>
             </Button>
 
             <nav className="flex space-x-6">

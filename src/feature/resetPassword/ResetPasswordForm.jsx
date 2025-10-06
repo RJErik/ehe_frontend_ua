@@ -5,7 +5,7 @@ import { Label } from "../../components/ui/label.jsx";
 import { Alert, AlertTitle, AlertDescription } from "../Alert.jsx";
 import { useNavigate } from "react-router-dom";
 
-// Password validation (min 8 characters, at least 1 letter and 1 number)
+// Password validation (min 8 characters, at least 1 letter and 1 number)y
 const validatePassword = (password) => {
     const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     return regex.test(password);
