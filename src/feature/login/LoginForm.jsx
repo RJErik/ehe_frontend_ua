@@ -126,7 +126,7 @@ const LoginForm = () => {
             console.log("Response data:", data);
 
             if (data.success) {
-                window.location.href = "/user";
+                window.location.href = data.redirectUrl;
             } else {
                 // For errors where resend might be needed
                 if (data.showResendButton) {
