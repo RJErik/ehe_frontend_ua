@@ -6,7 +6,6 @@ import { Label } from "../../components/ui/label.jsx";
 import { Alert, AlertTitle, AlertDescription } from "../Alert.jsx";
 import { useNavigate } from "react-router-dom";
 
-// Email validation function using regex
 const validateEmail = (email) => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
@@ -23,6 +22,7 @@ const LoginForm = () => {
     const [success, setSuccess] = useState(null);
     const [resendLoading, setResendLoading] = useState(false);
     const [registeredEmail, setRegisteredEmail] = useState(null);
+    const maxEmailLength = 255;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -72,34 +72,28 @@ const LoginForm = () => {
     };
 
     const handleButtonClick = (e) => {
-        // Check for empty fields first
         if (!formData.email && !formData.password) {
-            e.preventDefault(); // Prevent form submission
+            e.preventDefault();
             setError({ message: "Please enter both email and password", showResendButton: false });
             return;
         }
 
         if (!formData.email) {
-            e.preventDefault(); // Prevent form submission
+            e.preventDefault();
             setError({ message: "Please enter your email address", showResendButton: false });
             return;
         }
 
         if (!formData.password) {
-            e.preventDefault(); // Prevent form submission
+            e.preventDefault();
             setError({ message: "Please enter your password", showResendButton: false });
             return;
         }
 
-        // Validate email format when button is clicked
-        if (!validateEmail(formData.email)) {
-            e.preventDefault(); // Prevent form submission
+        if (!validateEmail(formData.email) || formData.email.length > maxEmailLength) {
+            e.preventDefault();
             setError({ message: "Please enter a valid email address", showResendButton: false });
-            return;
         }
-
-        // If validation passes, form will submit normally
-        // and handleSubmit will be called
     };
 
     const handleSubmit = async (e) => {
@@ -109,12 +103,11 @@ const LoginForm = () => {
         setError(null);
         setSuccess(null);
 
-        // Save the email for potential resend operations
         const submittedEmail = formData.email;
 
         try {
-            console.log("Making fetch request to /api/auth/login");
-            const response = await fetch('/api/auth/login', {
+            console.log("Making fetch request to /api/session");
+            const response = await fetch('/api/session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
@@ -128,12 +121,10 @@ const LoginForm = () => {
             if (data.success) {
                 window.location.href = data.redirectUrl;
             } else {
-                // For errors where resend might be needed
                 if (data.showResendButton) {
                     setRegisteredEmail(submittedEmail);
                 }
 
-                // Set error message with any action link
                 setError({
                     message: data.message || "Login failed. Please check your credentials.",
                     showResendButton: data.showResendButton === true,
@@ -155,10 +146,8 @@ const LoginForm = () => {
         navigate("/home");
     };
 
-    // Rest of the component remains unchanged
     return (
         <div className="max-w-xs w-full mx-auto mt-8 flex flex-col items-center">
-            {/* Component JSX remains the same */}
             <Avatar className="h-16 w-16 mb-4">
                 <AvatarFallback>
                     <svg
@@ -197,7 +186,6 @@ const LoginForm = () => {
                                 )}
                             </span>
 
-                            {/* Resend verification button */}
                             {typeof error !== 'string' && error.showResendButton && registeredEmail && (
                                 <div className="mt-4">
                                     <Button
@@ -232,7 +220,6 @@ const LoginForm = () => {
                                 )}
                             </span>
 
-                            {/* Resend verification button */}
                             {success.showResendButton && registeredEmail && (
                                 <div className="mt-4">
                                     <Button
@@ -277,7 +264,6 @@ const LoginForm = () => {
                         disabled={isLoading}
                     />
 
-                    {/* Add forgot password link */}
                     <div className="flex justify-end mt-1">
                         <Button
                             variant="link"

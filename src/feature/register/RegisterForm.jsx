@@ -6,23 +6,22 @@ import { Label } from "../../components/ui/label.jsx";
 import { Alert, AlertTitle, AlertDescription } from "../Alert.jsx";
 import { useNavigate } from "react-router-dom";
 
-// Email validation using regex
 const validateEmail = (email) => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
 };
 
-// Username validation (alphanumeric and underscore only, minimum 3 characters)
 const validateUsername = (username) => {
-    const regex = /^[a-zA-Z0-9_]{3,}$/;
+    const regex = /^[a-zA-Z0-9_]{3,100}$/;
     return regex.test(username);
 };
 
-// Password validation (min 8 characters, at least 1 letter and 1 number)
 const validatePassword = (password) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,72}$/;
     return regex.test(password);
 };
+
+const maxEmailLength = 255;
 
 const RegisterForm = () => {
     const navigate = useNavigate();
@@ -36,7 +35,6 @@ const RegisterForm = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [resendLoading, setResendLoading] = useState(false);
-    // Store email separately for resend functionality
     const [registeredEmail, setRegisteredEmail] = useState(null);
 
     const handleCancel = () => {
@@ -48,7 +46,6 @@ const RegisterForm = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing
         if (error) setError(null);
         if (success) setSuccess(null);
     };
@@ -58,7 +55,7 @@ const RegisterForm = () => {
 
         setResendLoading(true);
         try {
-            const response = await fetch('/api/auth/resend-verification', {
+            const response = await fetch('/api/auth/verification-requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: registeredEmail }),
@@ -94,7 +91,6 @@ const RegisterForm = () => {
     };
 
     const handleButtonClick = (e) => {
-        // Validation checks before form submission
         if (!formData.name && !formData.email && !formData.confirmPassword && !formData.password) {
             e.preventDefault();
             setError({ message: "Please fill in all fields", showResendButton: false });
@@ -131,7 +127,7 @@ const RegisterForm = () => {
             return;
         }
 
-        if (!validateEmail(formData.email)) {
+        if (!validateEmail(formData.email) || formData.email.length > maxEmailLength) {
             e.preventDefault();
             setError({ message: "Please enter a valid email address", showResendButton: false });
             return;
@@ -146,7 +142,6 @@ const RegisterForm = () => {
         if (formData.password !== formData.confirmPassword) {
             e.preventDefault();
             setError({ message: "Passwords do not match", showResendButton: false });
-            return;
         }
     };
 
@@ -156,11 +151,10 @@ const RegisterForm = () => {
         setError(null);
         setSuccess(null);
 
-        // Save the email for potential resend operations
         const submittedEmail = formData.email;
 
         try {
-            const response = await fetch('/api/auth/register', {
+            const response = await fetch('/api/auth/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -174,17 +168,14 @@ const RegisterForm = () => {
             const data = await response.json();
 
             if (data.success) {
-                // Store email for resend functionality
                 setRegisteredEmail(submittedEmail);
 
-                // Set success message with any action link
                 setSuccess({
                     message: data.message,
                     showResendButton: data.showResendButton === true,
                     actionLink: data.actionLink || null
                 });
 
-                // Clear all form fields on success
                 setFormData({
                     name: "",
                     email: "",
@@ -192,19 +183,15 @@ const RegisterForm = () => {
                     confirmPassword: ""
                 });
             } else {
-                // For errors where resend might be needed
                 if (data.showResendButton) {
                     setRegisteredEmail(submittedEmail);
                 }
 
-                // Set error message with any action link
                 setError({
                     message: data.message || "Registration failed. Please try again.",
                     showResendButton: data.showResendButton === true,
                     actionLink: data.actionLink || null
                 });
-
-                // Keep form data as is for error case
             }
         } catch (err) {
             console.error("Registration error:", err);
@@ -257,7 +244,6 @@ const RegisterForm = () => {
                                 )}
                             </span>
 
-                            {/* Resend verification button */}
                             {typeof error !== 'string' && error.showResendButton && registeredEmail && (
                                 <div className="mt-4">
                                     <Button
@@ -292,7 +278,6 @@ const RegisterForm = () => {
                                 )}
                             </span>
 
-                            {/* Resend verification button */}
                             {success.showResendButton && registeredEmail && (
                                 <div className="mt-4">
                                     <Button

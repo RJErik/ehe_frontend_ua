@@ -1,6 +1,5 @@
-// src/pages/ResetPassword.jsx - Updated with React Router
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ResetPasswordForm from "@/feature/resetPassword/ResetPasswordForm.jsx";
 import { Alert, AlertTitle, AlertDescription } from "../feature/Alert.jsx";
 import { Button } from "../components/ui/button.jsx";
@@ -8,7 +7,7 @@ import { Input } from "../components/ui/input.jsx";
 import { Label } from "../components/ui/label.jsx";
 
 const ResetPassword = () => {
-    const [searchParams] = useSearchParams();
+    const { token } = useParams();
     const navigate = useNavigate();
 
     const [tokenState, setTokenState] = useState({
@@ -24,9 +23,6 @@ const ResetPassword = () => {
     const [resendSuccess, setResendSuccess] = useState(false);
 
     useEffect(() => {
-        // Get token from URL search parameters
-        const token = searchParams.get("token");
-
         if (!token) {
             setTokenState({
                 loading: false,
@@ -38,10 +34,9 @@ const ResetPassword = () => {
             return;
         }
 
-        // Validate token with backend
         const validateToken = async () => {
             try {
-                const response = await fetch(`/api/auth/reset-password/validate?token=${token}`, {
+                const response = await fetch(`/api/auth/password-reset-tokens/${token}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -68,10 +63,9 @@ const ResetPassword = () => {
         };
 
         validateToken();
-    }, [searchParams]);
+    }, [token]);
 
     const handleResendRequest = () => {
-        // Show email form when resend button is clicked
         setShowEmailForm(true);
     };
 
@@ -84,7 +78,7 @@ const ResetPassword = () => {
         setResendLoading(true);
 
         try {
-            const response = await fetch('/api/auth/forgot-password', {
+            const response = await fetch('/api/auth/password-reset-requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailValue })
@@ -103,7 +97,6 @@ const ResetPassword = () => {
                 }));
                 setShowEmailForm(false);
             } else {
-                // Keep email form open on error
                 setTokenState(prev => ({
                     ...prev,
                     message: data.message,
@@ -138,7 +131,6 @@ const ResetPassword = () => {
                             token={tokenState.token}
                         />
                     ) : resendSuccess ? (
-                        // Show success message for resend email
                         <Alert className="border-green-500 bg-green-50 dark:bg-green-950 dark:border-green-800">
                             <AlertTitle className="text-green-800 dark:text-green-400">
                                 Email Sent
@@ -162,7 +154,6 @@ const ResetPassword = () => {
                             <AlertDescription>
                                 {tokenState.message}
 
-                                {/* Show resend button if backend indicates we should */}
                                 {tokenState.showResendButton && !showEmailForm && (
                                     <div className="mt-4">
                                         <Button
@@ -175,7 +166,6 @@ const ResetPassword = () => {
                                     </div>
                                 )}
 
-                                {/* Show email form only after resend button is clicked */}
                                 {showEmailForm && (
                                     <form onSubmit={handleEmailSubmit} className="mt-4 p-4 border border-red-300 rounded-md dark:border-red-800 transition-all duration-300 ease-in-out">
                                         <div className="space-y-2">

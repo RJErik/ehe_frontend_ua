@@ -1,4 +1,3 @@
-// App.jsx - Auth app with React Router and token handling
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
@@ -9,7 +8,6 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Header from "./feature/Header";
 
-// Wrapper component to provide token handler
 const AppContent = () => {
     return (
         <>

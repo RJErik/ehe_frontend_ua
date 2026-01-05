@@ -1,4 +1,3 @@
-// src/components/Header.jsx - Auth header with React Router
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../components/ui/button.jsx";
 import { ModeToggle } from "@/feature/Mode-toggle.jsx";

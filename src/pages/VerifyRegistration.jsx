@@ -1,6 +1,5 @@
-// src/pages/VerifyRegistration.jsx - Updated with React Router
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams , useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, AlertDescription } from "../feature/Alert.jsx";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -8,6 +7,7 @@ import { Label } from "../components/ui/label";
 
 const VerifyRegistration = () => {
     const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
     const navigate = useNavigate();
 
     const [verificationState, setVerificationState] = useState({
@@ -22,9 +22,6 @@ const VerifyRegistration = () => {
     });
 
     useEffect(() => {
-        // Get token from URL search parameters
-        const token = searchParams.get("token");
-
         if (!token) {
             setVerificationState({
                 loading: false,
@@ -35,10 +32,9 @@ const VerifyRegistration = () => {
             return;
         }
 
-        // Call verification endpoint
         const verifyToken = async () => {
             try {
-                const response = await fetch(`/api/auth/verify_registration?token=${token}`, {
+                const response = await fetch(`/api/auth/registrations/${token}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -49,7 +45,6 @@ const VerifyRegistration = () => {
                     loading: false,
                     success: data.success,
                     message: data.message,
-                    // Use the showResendButton flag directly from backend
                     showResendButton: data.showResendButton === true,
                     showEmailForm: false
                 });
@@ -65,14 +60,12 @@ const VerifyRegistration = () => {
         };
 
         verifyToken();
-    }, [searchParams]);
+    }, [token]);
 
     const handleResendVerification = () => {
-        // Show email form when resend button is clicked
         setVerificationState(prev => ({
             ...prev,
             showEmailForm: true
-            // Keep showResendButton true in case they want to cancel and try again
         }));
     };
 
@@ -88,7 +81,7 @@ const VerifyRegistration = () => {
         }));
 
         try {
-            const response = await fetch('/api/auth/resend-verification', {
+            const response = await fetch('/api/auth/verification-requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email })
@@ -101,8 +94,8 @@ const VerifyRegistration = () => {
                 resendLoading: false,
                 resendSuccess: data.success,
                 message: data.message,
-                showEmailForm: false, // Hide form after submission
-                showResendButton: data.showResendButton === true // Update based on response
+                showEmailForm: false,
+                showResendButton: data.showResendButton === true
             }));
         } catch (error) {
             console.error("Resend verification error:", error);
@@ -111,7 +104,7 @@ const VerifyRegistration = () => {
                 resendLoading: false,
                 resendSuccess: false,
                 message: "Failed to resend verification email. Please try again.",
-                showEmailForm: true // Keep form open on error
+                showEmailForm: true
             }));
         }
     };
@@ -145,7 +138,6 @@ const VerifyRegistration = () => {
                             </AlertDescription>
                         </Alert>
                     ) : verificationState.resendSuccess ? (
-                        // Show success message for resend email
                         <Alert className="border-green-500 bg-green-50 dark:bg-green-950 dark:border-green-800">
                             <AlertTitle className="text-green-800 dark:text-green-400">
                                 Email Sent
@@ -169,7 +161,6 @@ const VerifyRegistration = () => {
                             <AlertDescription>
                                 {verificationState.message}
 
-                                {/* Show resend button if backend indicates we should */}
                                 {verificationState.showResendButton && !verificationState.showEmailForm && (
                                     <div className="mt-4">
                                         <Button
@@ -181,7 +172,6 @@ const VerifyRegistration = () => {
                                     </div>
                                 )}
 
-                                {/* Show email form only after resend button is clicked */}
                                 {verificationState.showEmailForm && (
                                     <form onSubmit={handleEmailSubmit} className="mt-4 p-4 border border-red-300 rounded-md dark:border-red-800 transition-all duration-300 ease-in-out">
                                         <div className="space-y-2">

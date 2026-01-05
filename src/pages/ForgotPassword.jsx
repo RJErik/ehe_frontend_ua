@@ -1,4 +1,3 @@
-import Header from "../feature/Header.jsx";
 import ForgotPasswordForm from "@/feature/forgotPassword/ForgotPasswordForm.jsx";
 
 const ForgotPassword = ({ params }) => {

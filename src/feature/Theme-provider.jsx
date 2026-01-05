@@ -1,4 +1,3 @@
-// components/Theme-provider.jsx
 import React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -8,7 +7,6 @@ const ThemeContext = createContext({
 });
 
 export function ThemeProvider({ children, defaultTheme = "system", storageKey = "vite-ui-theme", ...props }) {
-    // Initialize state from localStorage immediately during component initialization
     const [theme, setTheme] = useState(() => {
         if (typeof window !== "undefined") {
             const savedTheme = localStorage.getItem(storageKey);

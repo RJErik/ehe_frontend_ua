@@ -5,13 +5,6 @@ import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import { useHomeInfoChart } from "@/hook/useHomeInfoChart";
 
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,

@@ -6,7 +6,6 @@ import { Label } from "../../components/ui/label.jsx";
 import { Alert, AlertTitle, AlertDescription } from "../Alert.jsx";
 import { useNavigate } from "react-router-dom";
 
-// Email validation using regex
 const validateEmail = (email) => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
@@ -20,6 +19,7 @@ const ForgotPasswordForm = ({ initialEmail = "" }) => {
     const [success, setSuccess] = useState(null);
     const [resendLoading, setResendLoading] = useState(false);
     const [submittedEmail, setSubmittedEmail] = useState(initialEmail || null);
+    const maxEmailLength = 255;
 
     const handleChange = (e) => {
         setEmail(e.target.value);
@@ -32,7 +32,7 @@ const ForgotPasswordForm = ({ initialEmail = "" }) => {
 
         setResendLoading(true);
         try {
-            const response = await fetch('/api/auth/forgot-password', {
+            const response = await fetch('/api/auth/password-reset-requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: submittedEmail }),
@@ -68,14 +68,13 @@ const ForgotPasswordForm = ({ initialEmail = "" }) => {
     };
 
     const handleButtonClick = (e) => {
-        // Validate before submitting
         if (!email || email.trim() === '') {
             e.preventDefault();
             setError({ message: "Please enter your email address", showResendButton: false });
             return;
         }
 
-        if (!validateEmail(email)) {
+        if (!validateEmail(email) || email.length > maxEmailLength) {
             e.preventDefault();
             setError({ message: "Please enter a valid email address", showResendButton: false });
             return;
@@ -89,12 +88,11 @@ const ForgotPasswordForm = ({ initialEmail = "" }) => {
         setError(null);
         setSuccess(null);
 
-        // Store the email for potential resend operations
         const emailToSubmit = email.trim();
         setSubmittedEmail(emailToSubmit);
 
         try {
-            const response = await fetch('/api/auth/forgot-password', {
+            const response = await fetch('/api/auth/password-reset-requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: emailToSubmit }),
@@ -110,7 +108,6 @@ const ForgotPasswordForm = ({ initialEmail = "" }) => {
                     actionLink: data.actionLink || null
                 });
 
-                // Clear form on success
                 setEmail("");
             } else {
                 setError({
@@ -177,7 +174,6 @@ const ForgotPasswordForm = ({ initialEmail = "" }) => {
                                 )}
                             </span>
 
-                            {/* Resend reset email button */}
                             {typeof error !== 'string' && error.showResendButton && submittedEmail && (
                                 <div className="mt-4">
                                     <Button
@@ -212,7 +208,6 @@ const ForgotPasswordForm = ({ initialEmail = "" }) => {
                                 )}
                             </span>
 
-                            {/* Resend reset email button */}
                             {success.showResendButton && submittedEmail && (
                                 <div className="mt-4">
                                     <Button

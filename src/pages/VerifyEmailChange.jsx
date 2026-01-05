@@ -1,11 +1,11 @@
-// src/pages/VerifyEmailChange.jsx - Updated with React Router
 import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams  } from "react-router-dom";
 import { Alert, AlertTitle, AlertDescription } from "../feature/Alert.jsx";
 import { Button } from "../components/ui/button";
 
 const VerifyEmailChange = () => {
     const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
     const navigate = useNavigate();
 
     const [verificationState, setVerificationState] = useState({
@@ -15,9 +15,6 @@ const VerifyEmailChange = () => {
     });
 
     useEffect(() => {
-        // Get token from URL search parameters
-        const token = searchParams.get("token");
-
         if (!token) {
             setVerificationState({
                 loading: false,
@@ -27,10 +24,9 @@ const VerifyEmailChange = () => {
             return;
         }
 
-        // Call verification endpoint
         const verifyToken = async () => {
             try {
-                const response = await fetch(`/api/auth/verify-email-change?token=${token}`, {
+                const response = await fetch(`/api/auth/email-verifications/${token}`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -53,7 +49,7 @@ const VerifyEmailChange = () => {
         };
 
         verifyToken();
-    }, [searchParams]);
+    }, [token]);
 
     return (
         <div className="min-h-screen flex flex-col">

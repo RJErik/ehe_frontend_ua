@@ -5,9 +5,8 @@ import { Label } from "../../components/ui/label.jsx";
 import { Alert, AlertTitle, AlertDescription } from "../Alert.jsx";
 import { useNavigate } from "react-router-dom";
 
-// Password validation (min 8 characters, at least 1 letter and 1 number)y
 const validatePassword = (password) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,72}$/;
     return regex.test(password);
 };
 
@@ -24,13 +23,11 @@ const ResetPasswordForm = ({ token }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear errors when typing
         if (error) setError(null);
         if (success) setSuccess(null);
     };
 
     const handleButtonClick = (e) => {
-        // Validate before submitting
         if (!formData.password && !formData.confirmPassword) {
             e.preventDefault();
             setError({ message: "Please enter and confirm your new password", showResendButton: false });
@@ -51,14 +48,13 @@ const ResetPasswordForm = ({ token }) => {
 
         if (!validatePassword(formData.password)) {
             e.preventDefault();
-            setError({ message: "Password must be at least 8 characters with at least one letter and one number", showResendButton: false });
+            setError({ message: "Password must be at least 8 and at most 72 characters with at least one letter and one number", showResendButton: false });
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
             e.preventDefault();
             setError({ message: "Passwords don't match", showResendButton: false });
-            return;
         }
     };
 
@@ -70,7 +66,7 @@ const ResetPasswordForm = ({ token }) => {
         setSuccess(null);
 
         try {
-            const response = await fetch('/api/auth/reset-password', {
+            const response = await fetch('/api/auth/password-resets', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -86,7 +82,6 @@ const ResetPasswordForm = ({ token }) => {
                     message: data.message,
                     showLoginButton: true
                 });
-                // Clear form on success
                 setFormData({
                     password: "",
                     confirmPassword: ""
