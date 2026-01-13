@@ -98,7 +98,6 @@ const LoginForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form submitted with data:", formData);
         setIsLoading(true);
         setError(null);
         setSuccess(null);
