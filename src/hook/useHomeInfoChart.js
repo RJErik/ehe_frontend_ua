@@ -11,7 +11,7 @@ export function useHomeInfoChart() {
         setError(null);
         try {
             console.log("Fetching worst stock data.");
-            const response = await fetch("http://localhost:8080/api/home/worst-stocks", {
+            const response = await fetch("/api/home/worst-stocks", {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -56,7 +56,7 @@ export function useHomeInfoChart() {
         setError(null);
         try {
             console.log("Fetching best stock data.");
-            const response = await fetch("http://localhost:8080/api/home/best-stocks", {
+            const response = await fetch("api/home/best-stocks", {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -100,7 +100,7 @@ export function useHomeInfoChart() {
         setError(null);
         try {
             console.log("Fetching latest transactions data.");
-            const response = await fetch("http://localhost:8080/api/home/latest-transactions", {
+            const response = await fetch("api/home/latest-transactions", {
                 method: "GET",
                 credentials: "include",
                 headers: {
