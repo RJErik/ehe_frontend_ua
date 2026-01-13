@@ -77,7 +77,6 @@ const ForgotPasswordForm = ({ initialEmail = "" }) => {
         if (!validateEmail(email) || email.length > maxEmailLength) {
             e.preventDefault();
             setError({ message: "Please enter a valid email address", showResendButton: false });
-            return;
         }
     };
 
